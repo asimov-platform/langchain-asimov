@@ -34,4 +34,4 @@ dist/
 *.egg-info/
 
 # hatch-vcs artifacts
-src/*/_version.py
+**/_version.py
