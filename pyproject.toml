@@ -13,7 +13,7 @@ license = "Unlicense"
 license-files = ["UNLICENSE"]
 authors = [{ name = "ASIMOV Protocol", email = "support@asimov.so" }]
 requires-python = ">=3.9"
-dependencies = ["langchain>=0.3"]
+dependencies = ["langchain-core>=0.3"]
 dynamic = ["version"]
 
 [project.urls]
@@ -32,7 +32,7 @@ source = "vcs"
 fallback-version = "0.0.0"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "src/langchain_asimov/_version.py"
+version-file = "langchain_asimov/_version.py"
 
 [tool.hatch.build.targets.sdist]
 exclude = [".*"]
