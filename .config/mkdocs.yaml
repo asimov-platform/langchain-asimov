@@ -1,0 +1,106 @@
+# See: https://www.mkdocs.org/user-guide/configuration/
+---
+docs_dir: ../docs
+
+site_name: langchain-asimov
+site_url: http://langchain-asimov.readthedocs.io/
+site_description: LangChain integration with the ASIMOV platform.
+site_author: ASIMOV Protocol
+repo_url: https://github.com/asimov-platform/langchain-asimov
+use_directory_urls: false
+
+extra:
+  social:
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/langchain-asimov/
+      name: ASIMOV for LangChain on PyPI
+    - icon: fontawesome/brands/github
+      link: https://github.com/asimov-platform
+      name: ASIMOV Platform on Github
+    - icon: fontawesome/brands/x-twitter
+      link: https://x.com/ASIMOV_Platform
+      name: ASIMOV Platform on X
+
+nav:
+  - index.md
+  - errors.md
+  - document_loaders.md
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tracking
+    - content.code.annotate
+    - content.code.copy
+    - search.highlight
+    - search.suggest
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: lime
+      toggle:
+        icon: material/weather-night
+        name: Switch to system preference
+
+plugins:
+  - git-committers:
+      repository: asimov-platform/langchain-asimov
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+  - llmstxt:
+      markdown_description: |
+        LangChain integration with the ASIMOV platform.
+      sections:
+        API reference:
+          - "*.md"
+  - mkdocstrings:
+      handlers:
+        python:
+          inventories:
+            - https://docs.python.org/3/objects.inv
+          options:
+            show_source: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            show_root_heading: false
+  - offline
+  - search
+  - social
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - pymdownx.betterem
+  - pymdownx.blocks.caption
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      default_lang: python
+  - pymdownx.inlinehilite
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tilde
+  - tables

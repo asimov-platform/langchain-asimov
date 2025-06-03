@@ -11,7 +11,7 @@ class AsimovModuleNotFound(Exception):
     """
 
     def __init__(self, module_name: str, message: str | None = None) -> None:
-        """Initializes the AsimovModuleNotFound exception.
+        """Initializes the `AsimovModuleNotFound` exception.
 
         Args:
             module_name: The name of the module that was not found

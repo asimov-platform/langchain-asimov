@@ -28,17 +28,19 @@ class AsimovLoader(BaseLoader):
     Setup:
         Install ``langchain-asimov``:
 
-        .. code-block:: bash
-            pip install -U langchain-asimov
+        ```bash
+        pip install -U langchain-asimov
+        ```
 
     Instantiate:
-        .. code-block:: python
-            from langchain_asimov import AsimovLoader
+        ```python
+        from langchain_asimov import AsimovLoader
 
-            loader = AsimovLoader(
-                module="serpapi",
-                url="https://duckduckgo.com/?q=Isaac+Asimov"
-            )
+        loader = AsimovLoader(
+            module="serpapi",
+            url="https://duckduckgo.com/?q=Isaac+Asimov"
+        )
+        ```
     """
     def __init__(self, module: str, url: str, **kwargs: Any) -> None:
         self.module = module

@@ -35,3 +35,6 @@ dist/
 
 # hatch-vcs artifacts
 **/_version.py
+
+# MkDocs artifacts
+.cache/
