@@ -1,5 +1,7 @@
 # This is free and unencumbered software released into the public domain.
 
+"""ASIMOV for LangChain: Exception classes."""
+
 from __future__ import annotations # for Python 3.9
 
 class AsimovModuleNotFound(Exception):

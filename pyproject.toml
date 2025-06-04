@@ -44,6 +44,7 @@ fallback-version = "0.0.0"
 version-file = "langchain_asimov/_version.py"
 
 [tool.hatch.build.targets.sdist]
+only-include = ["AUTHORS", "CHANGES.md", "Makefile", "VERSION", "langchain_asimov"]
 exclude = [".*"]
 
 [tool.hatch.envs.default]

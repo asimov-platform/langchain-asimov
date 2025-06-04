@@ -2,8 +2,8 @@
 ---
 docs_dir: ../docs
 
-site_name: langchain-asimov
-site_url: http://langchain-asimov.readthedocs.io/
+site_name: ASIMOV for LangChain
+site_url: https://langchain-asimov.readthedocs.io/
 site_description: LangChain integration with the ASIMOV platform.
 site_author: ASIMOV Protocol
 repo_url: https://github.com/asimov-platform/langchain-asimov
@@ -16,15 +16,17 @@ extra:
       name: ASIMOV for LangChain on PyPI
     - icon: fontawesome/brands/github
       link: https://github.com/asimov-platform
-      name: ASIMOV Platform on Github
+      name: ASIMOV Platform on GitHub
     - icon: fontawesome/brands/x-twitter
       link: https://x.com/ASIMOV_Platform
       name: ASIMOV Platform on X
 
 nav:
-  - index.md
-  - errors.md
-  - document_loaders.md
+  - langchain-asimov:
+      - README.md
+      - api.md
+      - errors.md
+      - document_loaders.md
 
 theme:
   name: material
@@ -73,8 +75,10 @@ plugins:
   - mkdocstrings:
       handlers:
         python:
+          paths: [.]
           inventories:
             - https://docs.python.org/3/objects.inv
+            - https://python.langchain.com/api_reference/objects.inv
           options:
             show_source: false
             show_symbol_type_heading: true

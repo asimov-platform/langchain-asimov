@@ -1,6 +1,6 @@
 # This is free and unencumbered software released into the public domain.
 
-"""ASIMOV document loader."""
+"""ASIMOV for LangChain: Document loaders."""
 
 from __future__ import annotations # for Python 3.9
 
