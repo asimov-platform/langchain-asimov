@@ -5,7 +5,8 @@
 [![Package](https://img.shields.io/pypi/v/langchain-asimov.svg)](https://pypi.python.org/pypi/langchain-asimov)
 [![Documentation](https://img.shields.io/readthedocs/langchain-asimov.svg)](https://langchain-asimov.readthedocs.io)
 
-[LangChain] integration with the [ASIMOV] platform.
+[LangChain] integration with [ASIMOV], a polyglot development platform for
+trustworthy, neurosymbolic AI.
 
 ## 🛠️ Prerequisites
 
@@ -24,8 +25,8 @@ pip install -U langchain-asimov
 
 ### Loading DuckDuckGo Results
 
-Use the [SerpApi module] to fetch search results from DuckDuckGo, Google,
-or Bing:
+Use e.g. the [SerpApi module] to fetch search results from DuckDuckGo,
+Google, or Bing:
 
 ```python
 from langchain_asimov import AsimovLoader
@@ -39,14 +40,17 @@ for result in search.lazy_load():
     print(result)
 ```
 
-On your host, make sure that `asimov-serpapi-importer` can be found in your
-`PATH` and that you've defined the `SERPAPI_KEY` environment variable:
-
-```bash
-export SERPAPI_KEY="..."
-```
+> [!TIP]
+> On your host, make sure that `asimov-serpapi-importer` can be found in your
+> `PATH` and that you've defined the `SERPAPI_KEY` environment variable:
+>
+> ```bash
+> export SERPAPI_KEY="..."
+> ```
 
 ### Loading X (Twitter) Profiles
+
+Use e.g. the [Bright Data module] to fetch a public X profile:
 
 ```python
 from langchain_asimov import AsimovLoader
@@ -60,14 +64,17 @@ for profile in profiles.lazy_load():
     print(profile)
 ```
 
-On your host, make sure that `asimov-brightdata-importer` can be found in your
-`PATH` and that you've defined the `BRIGHTDATA_API_KEY` environment variable:
-
-```bash
-export BRIGHTDATA_API_KEY="..."
-```
+> [!TIP]
+> On your host, make sure that `asimov-brightdata-importer` can be found in your
+> `PATH` and that you've defined the `BRIGHTDATA_API_KEY` environment variable:
+>
+> ```bash
+> export BRIGHTDATA_API_KEY="..."
+> ```
 
 ### Loading X (Twitter) Followers
+
+Use e.g. the [Apify module] to fetch the followers/followees for an X profile:
 
 ```python
 from langchain_asimov import AsimovLoader
@@ -81,12 +88,13 @@ for follower in followers.lazy_load():
     print(follower)
 ```
 
-On your host, make sure that `asimov-apify-importer` can be found in your
-`PATH` and that you've defined the `APIFY_TOKEN` environment variable:
-
-```bash
-export APIFY_TOKEN="..."
-```
+> [!TIP]
+> On your host, make sure that `asimov-apify-importer` can be found in your
+> `PATH` and that you've defined the `APIFY_TOKEN` environment variable:
+>
+> ```bash
+> export APIFY_TOKEN="..."
+> ```
 
 ## 📚 Reference
 

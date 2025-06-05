@@ -66,6 +66,7 @@ plugins:
       repository: asimov-platform/langchain-asimov
   - git-revision-date-localized:
       fallback_to_build_date: true
+  - gh-admonitions
   - llmstxt:
       markdown_description: |
         LangChain integration with the ASIMOV platform.

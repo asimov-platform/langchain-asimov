@@ -29,6 +29,7 @@ docs = [
     "mkdocs>=1.6",
     "mkdocs-git-committers-plugin-2>=2.5",
     "mkdocs-git-revision-date-localized-plugin>=1.2",
+    "mkdocs-github-admonitions-plugin>=0.1",
     "mkdocs-llmstxt>=0.2",
     "mkdocs-material[imaging]>=9.5",
     "mkdocstrings[python]>=0.29",
@@ -44,7 +45,13 @@ fallback-version = "0.0.0"
 version-file = "langchain_asimov/_version.py"
 
 [tool.hatch.build.targets.sdist]
-only-include = ["AUTHORS", "CHANGES.md", "Makefile", "VERSION", "langchain_asimov"]
+only-include = [
+    "AUTHORS",
+    "CHANGES.md",
+    "Makefile",
+    "VERSION",
+    "langchain_asimov",
+]
 exclude = [".*"]
 
 [tool.hatch.envs.default]
