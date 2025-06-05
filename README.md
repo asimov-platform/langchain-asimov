@@ -10,7 +10,7 @@
 ## 🛠️ Prerequisites
 
 - [Python] 3.9+
-- [ASIMOV] modules available in the [`PATH`]
+- [ASIMOV] [modules] available in the [`PATH`]
 
 ## ⬇️ Installation
 
@@ -22,27 +22,75 @@ pip install -U langchain-asimov
 
 ## 👉 Examples
 
-### Fetching DuckDuckGo Results
+### Loading DuckDuckGo Results
 
-```bash
-export SERPAPI_KEY="..."
-```
+Use the [SerpApi module] to fetch search results from DuckDuckGo, Google,
+or Bing:
 
 ```python
 from langchain_asimov import AsimovLoader
 
 search = AsimovLoader(
     module="serpapi",
-    url="https://duckduckgo.com/?q=Isaac+Asimov"
+    url="https://duckduckgo.com/?q=LangChain+roadmap"
 )
 
 for result in search.lazy_load():
     print(result)
 ```
 
+On your host, make sure that `asimov-serpapi-importer` can be found in your
+`PATH` and that you've defined the `SERPAPI_KEY` environment variable:
+
+```bash
+export SERPAPI_KEY="..."
+```
+
+### Loading X (Twitter) Profiles
+
+```python
+from langchain_asimov import AsimovLoader
+
+profiles = AsimovLoader(
+    module="brightdata",
+    url="https://x.com/LangChainAI"
+)
+
+for profile in profiles.lazy_load():
+    print(profile)
+```
+
+On your host, make sure that `asimov-brightdata-importer` can be found in your
+`PATH` and that you've defined the `BRIGHTDATA_API_KEY` environment variable:
+
+```bash
+export BRIGHTDATA_API_KEY="..."
+```
+
+### Loading X (Twitter) Followers
+
+```python
+from langchain_asimov import AsimovLoader
+
+followers = AsimovLoader(
+    module="apify",
+    url="https://x.com/LangChainAI/followers"
+)
+
+for follower in followers.lazy_load():
+    print(follower)
+```
+
+On your host, make sure that `asimov-apify-importer` can be found in your
+`PATH` and that you've defined the `APIFY_TOKEN` environment variable:
+
+```bash
+export APIFY_TOKEN="..."
+```
+
 ## 📚 Reference
 
-https://langchain-asimov.readthedocs.io
+[langchain-asimov.readthedocs.io](https://langchain-asimov.readthedocs.io)
 
 ## 👨‍💻 Development
 
@@ -62,3 +110,8 @@ git clone https://github.com/asimov-platform/langchain-asimov.git
 [LangChain]: https://github.com/langchain-ai/langchain
 [`PATH`]: https://en.wikipedia.org/wiki/PATH_(variable)
 [Python]: https://python.org
+[modules]: https://github.com/asimov-modules
+
+[Apify module]: https://github.com/asimov-modules/asimov-apify-module
+[Bright Data module]: https://github.com/asimov-modules/asimov-brightdata-module
+[SerpApi module]: https://github.com/asimov-modules/asimov-serpapi-module

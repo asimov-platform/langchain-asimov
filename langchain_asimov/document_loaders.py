@@ -76,4 +76,12 @@ class AsimovLoader(BaseLoader):
             raise error # TODO
 
 def describe(resource: dict) -> str:
-    return resource["know:summary"]["@value"] # TODO
+    if "know:summary" in resource:
+        return resource["know:summary"]["@value"]
+    if "know:title" in resource:
+        return resource["know:title"]["@value"]
+    if "know:name" in resource:
+        return resource["know:name"]["@value"]
+    if "know:link" in resource:
+        return resource["know:link"]
+    return resource["@id"]
