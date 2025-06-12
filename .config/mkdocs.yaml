@@ -1,6 +1,6 @@
 # See: https://www.mkdocs.org/user-guide/configuration/
 ---
-docs_dir: docs
+docs_dir: ../docs
 
 site_name: ASIMOV for LangChain
 site_url: https://langchain-asimov.readthedocs.io/

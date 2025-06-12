@@ -66,8 +66,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen --group docs
 
+      - name: Check directory structure
+        run: ls -la .config/ docs/  # Debug step to verify files
+
       - name: Build documentation
-        run: uv run mkdocs build --strict --config-file .config/mkdocs.yaml
+        run: |
+          cd .config
+          uv run mkdocs build --strict --config-file mkdocs.yaml
+        working-directory: .config
 
 #  # Continuous Deployment: Publish to PyPI
 #  publish:
