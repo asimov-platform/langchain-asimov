@@ -11,7 +11,7 @@ from .errors import AsimovModuleNotFound
 from langchain_core.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
 from pyld import jsonld
-from typing import Any, Iterator, cast, override
+from typing_extensions import Any, Iterator, cast, override
 
 logger = logging.getLogger(__file__)
 

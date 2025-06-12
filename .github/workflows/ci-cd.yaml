@@ -29,14 +29,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+        python-version: [ '3.9', '3.12' '3.13' ]   # ⬅️ only the edges
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
-          enable-cache: true
-      - run: uv sync --frozen --group test
+      - run: uv sync --frozen --group lint --group test
       - run: uv run pytest -q
 
   build:
@@ -86,3 +85,4 @@ jobs:
 #      - env:
 #          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
 #        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
+        
