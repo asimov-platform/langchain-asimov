@@ -1,58 +1,32 @@
-# CI/CD pipeline for langchain-asimov
 name: CI/CD
 
 on:
   push:
-#    branches:
-#      - master
   pull_request:
     branches:
       - master
   release:
     types: [published]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-#  # Continuous Integration: Test and Lint
-#  test-and-lint:
-#    runs-on: ubuntu-24.04
-#    strategy:
-#      matrix:
-#        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-#
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Set up UV
-#        run: |
-#          curl -LsSf https://astral.sh/uv/install.sh | sh
-#          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-#          uv --version
-#
-#      - name: Set up Python ${{ matrix.python-version }}
-#        run: uv python install ${{ matrix.python-version }}
-#
-#      - name: Install dependencies
-#        run: uv sync --frozen --group lint --group test
-#
-#      - name: Run linter (ruff)
-#        run: uv run ruff check .
-#
-#      - name: Run tests (pytest)
-#        run: uv run pytest
-
-  build:
+  setup:
     runs-on: ubuntu-24.04
-#    needs: test-and-lint
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Cache repository
+        uses: actions/cache@v4
+        with:
+          path: .
+          key: ${{ runner.os }}-repo-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-repo-
 
       - name: Set up UV
         run: |
@@ -60,70 +34,76 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           uv --version
 
-      - name: Set up Python 3.12
-        run: uv python install 3.12
+      - name: Cache UV
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+          restore-keys: ${{ runner.os }}-uv-
 
-      - name: Install dependencies
-        run: uv sync --frozen
+  test-and-lint:
+    runs-on: ubuntu-24.04
+    needs: setup
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+      fail-fast: false
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          python-version: ${{ matrix.python-version }}
+          dependency-groups: lint test
+
+      - name: Run linter (ruff)
+        run: uv run ruff check .
+
+      - name: Run tests (pytest)
+        run: uv run pytest
+
+  build:
+    runs-on: ubuntu-24.04
+    needs: test-and-lint
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          python-version: "3.12"
 
       - name: Build package
         run: uv build
 
       - name: Verify build artifacts
         run: ls -la dist/
-#
-#  # Documentation Build Check
-#  docs:
-#    runs-on: ubuntu-24.04
-#    if: github.event_name == 'push' || github.event_name == 'pull_request'
-#
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#
-#      - name: Set up UV
-#        run: |
-#          curl -LsSf https://astral.sh/uv/install.sh | sh
-#          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-#          uv --version
-#
-#      - name: Set up Python 3.13
-#        run: uv python install 3.13
-#
-#      - name: Install dependencies
-#        run: uv sync --frozen --group docs
-#
-#      - name: Build documentation
-#        env:
-#          MKDOCS_GIT_COMMITTERS_APIKEY: ${{ secrets.GITHUB_TOKEN }}
-#        run: uv run mkdocs build --config-file mkdocs.yaml
-#        working-directory: .config
-#
-#  # Continuous Deployment: Publish to PyPI
+
+  docs:
+    runs-on: ubuntu-24.04
+    needs: setup
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    steps:
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          python-version: "3.13"
+          dependency-groups: docs
+
+      - name: Build documentation
+        env:
+          MKDOCS_GIT_COMMITTERS_APIKEY: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run mkdocs build --config-file mkdocs.yaml
+        working-directory: .config
+
 #  publish:
 #    runs-on: ubuntu-24.04
 #    needs: test-and-lint
 #    if: github.event_name == 'release' && github.event.action == 'published'
-#
 #    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
+#      - name: Setup environment
+#        uses: ./.github/actions/setup-environment
 #        with:
-#          fetch-depth: 0
-#
-#      - name: Set up UV
-#        run: |
-#          curl -LsSf https://astral.sh/uv/install.sh | sh
-#          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-#          uv --version
-#
-#      - name: Set up Python 3.13
-#        run: uv python install 3.13
-#
-#      - name: Install dependencies
-#        run: uv sync --frozen
+#          python-version: "3.13"
+#          dependency-groups: ""
 #
 #      - name: Build package
 #        run: uv build

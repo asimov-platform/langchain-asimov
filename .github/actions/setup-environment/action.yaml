@@ -1,0 +1,45 @@
+name: Setup Environment
+description: Sets up Python and dependencies with caching, using cached UV
+inputs:
+  python-version:
+    description: Python version to install
+    required: true
+  dependency-groups:
+    description: UV dependency groups to sync
+    required: false
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Restore repository cache
+      uses: actions/cache/restore@v4
+      with:
+        path: .
+        key: ${{ runner.os }}-repo-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-repo-
+
+    - name: Restore UV cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.cargo
+        key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+        restore-keys: ${{ runner.os }}-uv-
+
+    - name: Ensure UV PATH
+      run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Cache UV dependencies
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: ${{ runner.os }}-uv-${{ inputs.python-version }}-${{ hashFiles('uv.lock') }}
+        restore-keys: ${{ runner.os }}-uv-${{ inputs.python-version }}-
+
+    - name: Set up Python
+      run: uv python install ${{ inputs.python-version }}
+      shell: bash
+
+    - name: Install dependencies
+      run: uv sync --frozen ${{ inputs.dependency-groups }}
+      shell: bash
