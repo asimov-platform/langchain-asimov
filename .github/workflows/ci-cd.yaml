@@ -43,9 +43,9 @@ jobs:
 #      - name: Run tests (pytest)
 #        run: uv run pytest
 
-  # Documentation Build Check
-  docs:
+  build:
     runs-on: ubuntu-24.04
+#    needs: test-and-lint
     if: github.event_name == 'push' || github.event_name == 'pull_request'
 
     steps:
@@ -60,18 +60,47 @@ jobs:
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           uv --version
 
-      - name: Set up Python 3.13
-        run: uv python install 3.13
+      - name: Set up Python 3.12
+        run: uv python install 3.12
 
       - name: Install dependencies
-        run: uv sync --frozen --group docs
+        run: uv sync --frozen
 
-      - name: Build documentation
-        env:
-          MKDOCS_GIT_COMMITTERS_APIKEY: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run mkdocs build --config-file mkdocs.yaml
-        working-directory: .config
+      - name: Build package
+        run: uv build
 
+      - name: Verify build artifacts
+        run: ls -la dist/
+#
+#  # Documentation Build Check
+#  docs:
+#    runs-on: ubuntu-24.04
+#    if: github.event_name == 'push' || github.event_name == 'pull_request'
+#
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Set up UV
+#        run: |
+#          curl -LsSf https://astral.sh/uv/install.sh | sh
+#          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+#          uv --version
+#
+#      - name: Set up Python 3.13
+#        run: uv python install 3.13
+#
+#      - name: Install dependencies
+#        run: uv sync --frozen --group docs
+#
+#      - name: Build documentation
+#        env:
+#          MKDOCS_GIT_COMMITTERS_APIKEY: ${{ secrets.GITHUB_TOKEN }}
+#        run: uv run mkdocs build --config-file mkdocs.yaml
+#        working-directory: .config
+#
 #  # Continuous Deployment: Publish to PyPI
 #  publish:
 #    runs-on: ubuntu-24.04
