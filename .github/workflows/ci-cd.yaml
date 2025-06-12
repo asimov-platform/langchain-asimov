@@ -67,7 +67,7 @@ jobs:
         run: uv sync --frozen --group docs
 
       - name: Build documentation
-        run: uv run mkdocs build --strict
+        run: uv run mkdocs build --strict --config-file .config/mkdocs.yaml
 
 #  # Continuous Deployment: Publish to PyPI
 #  publish:
