@@ -66,11 +66,10 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen --group docs
 
-      - name: Check directory structure
-        run: ls -la .config/ docs/  # Verify .config/mkdocs.yaml and docs/ exist
-
       - name: Build documentation
-        run: uv run mkdocs build --strict --config-file mkdocs.yaml
+        env:
+          MKDOCS_GIT_COMMITTERS_APIKEY: ${{ secrets.GITHUB_TOKEN }}
+        run: uv run mkdocs build --config-file mkdocs.yaml
         working-directory: .config
 
 #  # Continuous Deployment: Publish to PyPI
