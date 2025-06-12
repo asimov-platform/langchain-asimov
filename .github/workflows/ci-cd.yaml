@@ -67,12 +67,10 @@ jobs:
         run: uv sync --frozen --group docs
 
       - name: Check directory structure
-        run: ls -la .config/ docs/  # Debug step to verify files
+        run: ls -la .config/ docs/  # Verify .config/mkdocs.yaml and docs/ exist
 
       - name: Build documentation
-        run: |
-          cd .config
-          uv run mkdocs build --strict --config-file mkdocs.yaml
+        run: uv run mkdocs build --strict --config-file mkdocs.yaml
         working-directory: .config
 
 #  # Continuous Deployment: Publish to PyPI
