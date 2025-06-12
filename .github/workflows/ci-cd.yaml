@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.x"
+          python-version: "3.13"
           enable-cache: true
       - run: uv sync --frozen --group lint
       - run: uv run ruff check .
@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.9", "3.12", "3.x" ]
+        python-version: [ "3.9", "3.12", "3.13" ]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.x"
+          python-version: "3.13"
           enable-cache: true
       - run: uv sync --frozen
       - run: uv build
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.x"
+          python-version: "3.13"
           enable-cache: true
       - run: uv sync --frozen --group docs
       - run: uv run mkdocs build --config-file mkdocs.yaml
@@ -79,7 +79,7 @@ jobs:
           path: dist
       - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.x"
+          python-version: "3.13"
           enable-cache: true
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
