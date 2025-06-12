@@ -12,41 +12,12 @@ on:
     types: [published]
 
 jobs:
-  # Continuous Integration: Test and Lint
-  test-and-lint:
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          uv --version
-
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: uv sync --frozen --group lint --group test
-
-      - name: Run linter (ruff)
-        run: uv run ruff check .
-
-      - name: Run tests (pytest)
-        run: uv run pytest
-
-#  # Documentation Build Check
-#  docs:
+#  # Continuous Integration: Test and Lint
+#  test-and-lint:
 #    runs-on: ubuntu-24.04
-#    if: github.event_name == 'push' || github.event_name == 'pull_request'
+#    strategy:
+#      matrix:
+#        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 #
 #    steps:
 #      - name: Checkout repository
@@ -60,15 +31,44 @@ jobs:
 #          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 #          uv --version
 #
-#      - name: Set up Python 3.13
-#        run: uv python install 3.13
+#      - name: Set up Python ${{ matrix.python-version }}
+#        run: uv python install ${{ matrix.python-version }}
 #
 #      - name: Install dependencies
-#        run: uv sync --frozen --group docs
+#        run: uv sync --frozen --group lint --group test
 #
-#      - name: Build documentation
-#        run: uv run mkdocs build --strict
+#      - name: Run linter (ruff)
+#        run: uv run ruff check .
 #
+#      - name: Run tests (pytest)
+#        run: uv run pytest
+
+  # Documentation Build Check
+  docs:
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up UV
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          uv --version
+
+      - name: Set up Python 3.13
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --frozen --group docs
+
+      - name: Build documentation
+        run: uv run mkdocs build --strict
+
 #  # Continuous Deployment: Publish to PyPI
 #  publish:
 #    runs-on: ubuntu-24.04
