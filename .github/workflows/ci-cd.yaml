@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.9', '3.12' '3.13' ]   # ⬅️ only the edges
+        python-version: [ "3.9", "3.12", "3.13" ]
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
