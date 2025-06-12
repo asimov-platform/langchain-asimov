@@ -16,18 +16,6 @@ jobs:
   setup:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Cache repository
-        uses: actions/cache@v4
-        with:
-          path: .
-          key: ${{ runner.os }}-repo-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-repo-
-
       - name: Set up UV
         run: |
           curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -49,6 +37,9 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
       fail-fast: false
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         uses: ./.github/actions/setup-environment
         with:
@@ -66,6 +57,9 @@ jobs:
     needs: test-and-lint
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         uses: ./.github/actions/setup-environment
         with:
@@ -82,6 +76,9 @@ jobs:
     needs: setup
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup environment
         uses: ./.github/actions/setup-environment
         with:
