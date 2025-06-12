@@ -1,129 +1,88 @@
-# CI/CD pipeline for langchain-asimov
 name: CI/CD
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
   push:
   pull_request:
-    branches:
-      - master
+    branches: [master]
   release:
     types: [published]
 
 jobs:
-  test-and-lint:
+  lint:
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
         with:
-          fetch-depth: 0
+          python-version: "3.13"
+          enable-cache: true
+      - run: uv sync --frozen --group lint
+      - run: uv run ruff check .
 
-      - name: Set up UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          uv --version
-
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: uv sync --frozen --group lint --group test
-
-      - name: Run linter (ruff)
-        run: uv run ruff check .
-
-      - name: Run tests (pytest)
-        run: uv run pytest
+  test:
+    runs-on: ubuntu-24.04
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - run: uv sync --frozen --group test
+      - run: uv run pytest -q
 
   build:
     runs-on: ubuntu-24.04
-    needs: test-and-lint
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-
+    needs: test
+    if: github.event_name != 'release'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
         with:
-          fetch-depth: 0
-
-      - name: Set up UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          uv --version
-
-      - name: Set up Python 3.12
-        run: uv python install 3.12
-
-      - name: Install dependencies
-        run: uv sync --frozen
-
-      - name: Build package
-        run: uv build
-
-      - name: Verify build artifacts
-        run: ls -la dist/
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
 
   docs:
     runs-on: ubuntu-24.04
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-
+    needs: lint
+    if: github.event_name != 'release'
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
         with:
-          fetch-depth: 0
-
-      - name: Set up UV
-        run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          uv --version
-
-      - name: Set up Python 3.13
-        run: uv python install 3.13
-
-      - name: Install dependencies
-        run: uv sync --frozen --group docs
-
-      - name: Build documentation
-        env:
-          MKDOCS_GIT_COMMITTERS_APIKEY: ${{ secrets.GITHUB_TOKEN }}
-        run: uv run mkdocs build --config-file mkdocs.yaml
+          python-version: "3.13"
+          enable-cache: true
+      - run: uv sync --frozen --group docs
+      - run: uv run mkdocs build --config-file mkdocs.yaml
         working-directory: .config
 
 #  publish:
 #    runs-on: ubuntu-24.04
-#    needs: test-and-lint
+#    needs: build
 #    if: github.event_name == 'release' && github.event.action == 'published'
-#
 #    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
+#      - uses: actions/download-artifact@v4
 #        with:
-#          fetch-depth: 0
-#
-#      - name: Set up UV
-#        run: |
-#          curl -LsSf https://astral.sh/uv/install.sh | sh
-#          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-#          uv --version
-#
-#      - name: Set up Python 3.13
-#        run: uv python install 3.13
-#
-#      - name: Install dependencies
-#        run: uv sync --frozen
-#
-#      - name: Build package
-#        run: uv build
-#
-#      - name: Publish to PyPI
-#        env:
+#          name: dist
+#          path: dist
+#      - uses: astral-sh/setup-uv@v6
+#        with:
+#          python-version: "3.13"
+#          enable-cache: true
+#      - env:
 #          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-#        run: uv publish --token $UV_PUBLISH_TOKEN
+#        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
