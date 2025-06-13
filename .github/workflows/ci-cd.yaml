@@ -13,55 +13,35 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Define default settings and environment variables
-env:
-  PYTHON_VERSION: "3.13"
-defaults:
-  run:
-    working-directory: .
-
-# Reusable step templates
-steps_checkout: &checkout
-  - name: Checkout repository
-    uses: actions/checkout@v4
-
-steps_setup_uv: &setup_uv
-  - name: Set up UV and Python
-    uses: astral-sh/setup-uv@v6
-    with:
-      python-version: ${{ env.PYTHON_VERSION }}
-      enable-cache: true
-
 jobs:
   # Lint job: Runs linters, skipped on tag pushes
   lint:
     runs-on: ubuntu-24.04
     if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
-      - *checkout
-      - *setup_uv
-      - name: Sync UV dependencies for lint
-        run: uv sync --frozen --group lint
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - run: uv sync --frozen --group lint
 
   # Test job: Runs tests in parallel across multiple Python versions, skipped on tag pushes
   test:
     runs-on: ubuntu-24.04
     needs: lint
     strategy:
-      fail-fast: false  # Continue even if one version fails
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.12", "3.13"]  # Parallel test jobs
+        python-version: [ "3.9", "3.12", "3.13" ]
     steps:
-      - *checkout
-      - name: Set up UV and Python for test matrix
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
-      - name: Sync UV dependencies for test
-        run: uv sync --frozen --group lint --group test
-      - name: Run pytest
-        run: uv run pytest -q
+      - run: uv sync --frozen --group lint --group test
+      - run: uv run pytest -q
 
   # Build job: Builds the project, skipped on non-tag pushes
   build:
@@ -69,15 +49,15 @@ jobs:
     needs: test
     if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
-      - *checkout
-      - *setup_uv
-      - name: Sync UV dependencies for build
-        run: uv sync --frozen
-      - name: Build project
-        run: uv build
-      - name: Upload dist artifacts (only on tag pushes)
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv build
+      - uses: actions/upload-artifact@v4
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist
@@ -88,16 +68,14 @@ jobs:
     needs: lint
     if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
-      - *checkout
-      - *setup_uv
-      - name: Sync UV dependencies for docs
-        run: uv sync --frozen --group docs
-      - name: Build MkDocs documentation
-        run: uv run mkdocs build --config-file mkdocs.yaml
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - run: uv sync --frozen --group docs
+      - run: uv run mkdocs build --config-file mkdocs.yaml
         working-directory: .config
-
-  # Release Jobs
-  # --------------------------------
 
   # Release job: Creates GitHub release, runs only on tag pushes
   release:
@@ -107,9 +85,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - *checkout
-      - name: Create GitHub release
-        uses: asimov-platform/release-action@v2
+      - uses: actions/checkout@v4
+      - uses: asimov-platform/release-action@v2
         with:
           app_id: ${{ secrets.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
@@ -121,16 +98,19 @@ jobs:
     runs-on: ubuntu-24.04
     needs: release
     steps:
-      - *checkout
-      - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-          continue-on-error: true
-      - *setup_uv
-      - name: Publish to PyPI
-        env:
+        continue-on-error: true
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: echo "Hello world"
-        # run: uv publish --token $UV_PUBLISH_TOKEN dist/*
+#        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
+        working-directory: .
+
