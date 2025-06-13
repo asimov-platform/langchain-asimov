@@ -95,19 +95,9 @@ jobs:
         with:
           python-version: "3.13"
           enable-cache: true
-      - run: uv add twine
-        working-directory: .
-      - name: Check artifacts and run twine
-        run: |
-          if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
-            uv run twine check dist/*
-            echo "Twine check passed for existing artifacts."
-          else
-            echo "No dist artifacts found or directory is empty. Skipping twine check."
-          fi
-        working-directory: .
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
+        run: echo "Hellow world"
+#        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
         working-directory: .
 
