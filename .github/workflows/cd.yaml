@@ -54,6 +54,5 @@ jobs:
           enable-cache: true
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: echo "Hello world"
-        # run: uv publish --token $UV_PUBLISH_TOKEN dist/*
+        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
         working-directory: .
