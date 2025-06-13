@@ -76,7 +76,8 @@ jobs:
     steps:
       - uses: asimov-platform/release-action@v2
         with:
-          token: ${{ secrets.PAT_RELEASE }}
+          app_id: ${{ secrets.APP_ID }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
           changelog-path: CHANGES.md
 
   publish:
