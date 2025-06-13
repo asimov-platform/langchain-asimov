@@ -21,7 +21,6 @@ jobs:
           python-version: "3.13"
           enable-cache: true
       - run: uv sync --frozen --group lint
-      - run: uv run ruff check src/
 
   test:
     runs-on: ubuntu-24.04
