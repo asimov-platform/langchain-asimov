@@ -2,7 +2,7 @@ name: CI/CD
 
 on:
   push:
-    branches: ["*"]
+    branches: ["master"]
     tags: ["*"]
   pull_request:
     branches: [master]
@@ -97,7 +97,6 @@ jobs:
           enable-cache: true
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: echo "Hellow world"
-#        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
+        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
         working-directory: .
 
