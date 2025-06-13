@@ -74,20 +74,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - name: Parse changelog
-        id: changelog
-        uses: release-flow/keep-a-changelog-action@v3
+      - uses: asimov-platform/release-action@v2
         with:
-          command: query
-          version: ${{ github.ref_name }}
-          changelog: CHANGES.md
-      - name: Create release with source code archives only
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.release-notes }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          app_id: ${{ secrets.APP_ID }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          changelog-path: CHANGES.md
+          compute-checksum: false
 
   publish:
     runs-on: ubuntu-24.04
@@ -116,13 +108,6 @@ jobs:
         working-directory: .
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          if [ -z "$UV_PUBLISH_TOKEN" ]; then
-            echo "UV_PUBLISH_TOKEN is not set in repository secrets. Publishing skipped."
-          else
-            echo "UV_PUBLISH_TOKEN is set. Ready to publish, but publishing is currently disabled."
-            # uv publish --token $UV_PUBLISH_TOKEN dist/*  # Uncomment to enable publishing
-          fi
+        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
         working-directory: .
-#        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
 
