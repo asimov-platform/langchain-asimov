@@ -79,6 +79,7 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
           changelog-path: CHANGES.md
+          compute-checksum: false
 
   publish:
     runs-on: ubuntu-24.04
