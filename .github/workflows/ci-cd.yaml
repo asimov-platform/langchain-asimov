@@ -93,6 +93,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: release
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: dist
@@ -103,6 +104,7 @@ jobs:
           python-version: "3.13"
           enable-cache: true
       - run: uv add twine
+        working-directory: .
       - name: Check artifacts and run twine
         run: |
           if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
@@ -111,6 +113,7 @@ jobs:
           else
             echo "No dist artifacts found or directory is empty. Skipping twine check."
           fi
+        working-directory: .
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
@@ -120,5 +123,6 @@ jobs:
             echo "UV_PUBLISH_TOKEN is set. Ready to publish, but publishing is currently disabled."
             # uv publish --token $UV_PUBLISH_TOKEN dist/*  # Uncomment to enable publishing
           fi
+        working-directory: .
 #        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
 
