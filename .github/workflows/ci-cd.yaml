@@ -21,28 +21,25 @@ defaults:
     working-directory: .
 
 # Reusable step templates
-steps:
-  &checkout-step
-    - name: Checkout repository
-      uses: actions/checkout@v4
+steps_checkout: &checkout
+  - name: Checkout repository
+    uses: actions/checkout@v4
 
-  &setup-uv-step
-    - name: Set up UV and Python
-      uses: astral-sh/setup-uv@v6
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        enable-cache: true
+steps_setup_uv: &setup_uv
+  - name: Set up UV and Python
+    uses: astral-sh/setup-uv@v6
+    with:
+      python-version: ${{ env.PYTHON_VERSION }}
+      enable-cache: true
 
-# Development Jobs
-# --------------------------------
 jobs:
   # Lint job: Runs linters, skipped on tag pushes
   lint:
     runs-on: ubuntu-24.04
     if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
-      - *checkout-step
-      - *setup-uv-step
+      - *checkout
+      - *setup_uv
       - name: Sync UV dependencies for lint
         run: uv sync --frozen --group lint
 
@@ -53,9 +50,9 @@ jobs:
     strategy:
       fail-fast: false  # Continue even if one version fails
       matrix:
-        python-version: [ "3.9", "3.12", "3.13" ]  # Parallel test jobs
+        python-version: ["3.9", "3.12", "3.13"]  # Parallel test jobs
     steps:
-      - *checkout-step
+      - *checkout
       - name: Set up UV and Python for test matrix
         uses: astral-sh/setup-uv@v6
         with:
@@ -72,8 +69,8 @@ jobs:
     needs: test
     if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
-      - *checkout-step
-      - *setup-uv-step
+      - *checkout
+      - *setup_uv
       - name: Sync UV dependencies for build
         run: uv sync --frozen
       - name: Build project
@@ -91,8 +88,8 @@ jobs:
     needs: lint
     if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
-      - *checkout-step
-      - *setup-uv-step
+      - *checkout
+      - *setup_uv
       - name: Sync UV dependencies for docs
         run: uv sync --frozen --group docs
       - name: Build MkDocs documentation
@@ -110,7 +107,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - *checkout-step
+      - *checkout
       - name: Create GitHub release
         uses: asimov-platform/release-action@v2
         with:
@@ -124,17 +121,16 @@ jobs:
     runs-on: ubuntu-24.04
     needs: release
     steps:
-      - *checkout-step
+      - *checkout
       - name: Download dist artifacts
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist
-        continue-on-error: true
-      - *setup-uv-step
+          continue-on-error: true
+      - *setup_uv
       - name: Publish to PyPI
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: echo "Hello world"
-#        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
-
+        # run: uv publish --token $UV_PUBLISH_TOKEN dist/*
