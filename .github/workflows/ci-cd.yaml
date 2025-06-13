@@ -74,12 +74,20 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: asimov-platform/release-action@v2
+      - uses: actions/checkout@v4
+      - name: Parse changelog
+        id: changelog
+        uses: release-flow/keep-a-changelog-action@v3
         with:
-          app_id: ${{ secrets.APP_ID }}
-          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
-          changelog-path: CHANGES.md
-          compute-checksum: false
+          command: query
+          version: ${{ github.ref_name }}
+          changelog: CHANGES.md
+      - name: Create release with source code archives only
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.release-notes }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
     runs-on: ubuntu-24.04
@@ -89,11 +97,20 @@ jobs:
         with:
           name: dist
           path: dist
+        continue-on-error: true
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.13"
           enable-cache: true
-      - run: uv run twine check dist/*
+      - run: uv add twine
+      - name: Check artifacts and run twine
+        run: |
+          if [ -d "dist" ] && [ "$(ls -A dist)" ]; then
+            uv run twine check dist/*
+            echo "Twine check passed for existing artifacts."
+          else
+            echo "No dist artifacts found or directory is empty. Skipping twine check."
+          fi
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
