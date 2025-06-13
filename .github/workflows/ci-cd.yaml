@@ -2,11 +2,10 @@ name: CI/CD
 
 on:
   push:
-    branches: [master]
+    branches: ["*"]
+    tags: ["*"]
   pull_request:
     branches: [master]
-  release:
-    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,7 +21,7 @@ jobs:
           python-version: "3.13"
           enable-cache: true
       - run: uv sync --frozen --group lint
-      - run: uv run ruff check .
+      - run: uv run ruff check src/
 
   test:
     runs-on: ubuntu-24.04
@@ -58,7 +57,7 @@ jobs:
   docs:
     runs-on: ubuntu-24.04
     needs: lint
-    if: github.event_name != 'release'
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -68,10 +67,22 @@ jobs:
       - run: uv sync --frozen --group docs
       - run: uv run mkdocs build --config-file mkdocs.yaml
         working-directory: .config
-  publish:
+
+  release:
     runs-on: ubuntu-24.04
     needs: build
-    if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - uses: asimov-platform/release-action@v2
+        with:
+          token: ${{ secrets.PAT_RELEASE }}
+          changelog-path: CHANGELOG.md
+
+  publish:
+    runs-on: ubuntu-24.04
+    needs: release
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -81,7 +92,15 @@ jobs:
         with:
           python-version: "3.13"
           enable-cache: true
+      - run: uv run twine check dist/*
       - env:
           UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN }}
-        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
+        run: |
+          if [ -z "$UV_PUBLISH_TOKEN" ]; then
+            echo "UV_PUBLISH_TOKEN is not set in repository secrets. Publishing skipped."
+          else
+            echo "UV_PUBLISH_TOKEN is set. Ready to publish, but publishing is currently disabled."
+            # uv publish --token $UV_PUBLISH_TOKEN dist/*  # Uncomment to enable publishing
+          fi
+#        run: uv publish --token $UV_PUBLISH_TOKEN dist/*
 
