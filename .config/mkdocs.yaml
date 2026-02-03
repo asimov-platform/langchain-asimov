@@ -5,7 +5,7 @@ docs_dir: ../docs
 site_name: ASIMOV for LangChain
 site_url: https://langchain-asimov.readthedocs.io/
 site_description: LangChain integration with the ASIMOV platform.
-site_author: ASIMOV Protocol
+site_author: ASIMOV Systems
 repo_url: https://github.com/asimov-platform/langchain-asimov
 use_directory_urls: false
 

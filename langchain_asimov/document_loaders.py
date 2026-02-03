@@ -2,8 +2,6 @@
 
 """ASIMOV for LangChain: Document loaders."""
 
-from __future__ import annotations # for Python 3.9
-
 import json
 import logging
 import subprocess

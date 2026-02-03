@@ -10,8 +10,8 @@ trustworthy, neurosymbolic AI.
 
 ## 🛠️ Prerequisites
 
-- [Python] 3.9+
-- [ASIMOV] [modules] available in the [`PATH`]
+- [Python] 3.10+
+- [ASIMOV] [modules] available in the [`PATH`] and/or `$HOME/.asimov/libexec`
 
 ## ⬇️ Installation
 

@@ -2,8 +2,6 @@
 
 """ASIMOV for LangChain: Exception classes."""
 
-from __future__ import annotations # for Python 3.9
-
 class AsimovModuleNotFound(Exception):
     """Exception raised when a module cannot be found or imported.
 

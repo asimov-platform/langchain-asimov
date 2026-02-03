@@ -9,15 +9,15 @@ build-backend = "hatchling.build"
 name = "langchain-asimov"
 description = "LangChain integration with the ASIMOV platform."
 readme = "README.md"
-authors = [{ name = "ASIMOV Protocol", email = "support@asimov.so" }]
+authors = [{ name = "ASIMOV Systems", email = "support@asimov.systems" }]
 license = "Unlicense"
 license-files = ["UNLICENSE"]
 dynamic = ["version"]
 
-requires-python = ">=3.9"
-dependencies = ["langchain-core>=0.3", "PyLD>=2"]
+requires-python = ">=3.10"
+dependencies = ["asimov.py", "langchain-core>=0.3", "PyLD>=2"]
 
-keywords = ["asimov-module", "asimov", "ai"]
+keywords = ["asimov"]
 classifiers = []
 
 [project.urls]
@@ -40,7 +40,7 @@ docs = [
     "mkdocstrings[python]>=0.29",
 ]
 lint = ["ruff"]
-test = ["pytest", "pytest-mock"]
+test = ["pytest"]
 
 [tool.hatch.version]
 source = "vcs"
